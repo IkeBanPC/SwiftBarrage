@@ -9,9 +9,9 @@
 import UIKit
 public class SwiftBarrageCell: UIView {
     var idle: Bool?
-    var idleTime: TimeInterval?
+    var idleTime: TimeInterval = 0
     var barrageDescriptor: SwiftBarrageDescriptor?
-    var trackIndex: Int?
+    var trackIndex: Int
     
     public var barrageAnimation: CAAnimation? {
         get {
@@ -19,12 +19,15 @@ public class SwiftBarrageCell: UIView {
         }
     }
     required public init() {
-        super.init(frame: CGRect())
         self.trackIndex = -1
+        super.init(frame: CGRect())
+        
     }
     
     required public init?(coder aDecoder: NSCoder) {
+        self.trackIndex = -1
         super.init(coder: aDecoder)
+        
     }
     
     func prepareForReuse() {

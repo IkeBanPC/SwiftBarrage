@@ -9,9 +9,13 @@
 import UIKit
 
 public class SwiftBarrageTrackInfo {
-    var trackIndex: Int?
-    var trackIdentifier: String?
-    var nextAvailableTime: CFTimeInterval?
-    var barrageCount: Int?
+    var trackIndex: Int
+    var trackIdentifier: String
+    var nextAvailableTime: CFTimeInterval = 0
+    var barrageCount: Int = 0
     var trackHeight: CGFloat?
+    init(trackIndex:Int,trackIdentifier:String) {
+        self.trackIndex = trackIndex
+        self.trackIdentifier = trackIdentifier
+    }
 }

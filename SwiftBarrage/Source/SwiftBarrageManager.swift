@@ -33,7 +33,7 @@ public class SwiftBarrageManager {
     
     public func render(barrageDescriptor: SwiftBarrageDescriptor) {
         if let barrageCell = self.renderView.dequeueReusableCell(with: barrageDescriptor.barrageCellClass) {
-            barrageCell.barrageDescriptor = barrageDescriptor
+            barrageCell.set(barrageDescriptor: barrageDescriptor)
             self.renderView.fire(barrageCell: barrageCell)
         }
     }

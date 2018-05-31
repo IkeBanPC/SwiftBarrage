@@ -9,51 +9,64 @@
 import UIKit
 public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
     var textAttribute: [NSAttributedStringKey:Any]
-    var textFont: UIFont
-    var textColor: UIColor
+    var textFont: UIFont {
+        didSet {
+            textAttribute[NSAttributedStringKey.font] = textFont
+        }
+    }
+    var textColor: UIColor {
+        didSet {
+            textAttribute[NSAttributedStringKey.foregroundColor] = textColor
+        }
+    }
     var textShadowOpened: Bool
-    var shadowColor: UIColor
+    var shadowColor: UIColor {
+        didSet {
+            if !textShadowOpened {
+                textAttribute[NSAttributedStringKey.strokeColor] = strokeColor
+            }
+        }
+    }
     var shadowOffset: CGSize
     var shadowRadius: CGFloat
     var shadowOpacity: Float
-    var strokeColor: UIColor?
-    var strokeWidth: Int?
-    var text: String? {
-        get{
-            return attributedText?.string
+    var strokeColor: UIColor? {
+        didSet {
+            if let color = strokeColor {
+                textAttribute[NSAttributedStringKey.strokeColor] = color
+            }
         }
     }
+    var strokeWidth: Float? {
+        didSet {
+            if let width = strokeWidth {
+                textAttribute[NSAttributedStringKey.strokeWidth] = NSNumber(value: width)
+            }
+        }
+    }
+    var text: String?
+    
     var attributedText: NSAttributedString? {
         get {
-            if self.attributedText == nil {
-                if text == nil {
-                    return nil
-                } else {
-                    self.attributedText = NSAttributedString(string: text ?? "", attributes: textAttribute)
-                }
-            }
+            let tempAttributedText = NSAttributedString(string: text ?? "", attributes: textAttribute)
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.baseWritingDirection = .leftToRight
-            if let noNilValue = self.attributedText {
-                let tempText = NSMutableAttributedString(attributedString: noNilValue)
-                tempText.addAttributes([
-                    NSAttributedStringKey.paragraphStyle:paragraphStyle
-                    ], range: NSRange(location: 0, length: tempText.string.count))
-                return tempText.copy() as? NSAttributedString
-            }
-            return nil
-        }
-        set {
-            self.attributedText = newValue
+            let attributedText = NSMutableAttributedString(attributedString: tempAttributedText)
+            attributedText.addAttributes([
+                NSAttributedStringKey.paragraphStyle:paragraphStyle,
+                ], range: NSRange(location: 0, length: attributedText.string.count))
+            return  attributedText.copy() as? NSAttributedString
         }
     }
+
+
     override init() {
         textAttribute = [NSAttributedStringKey:Any]()
-        shadowColor = .black
+        shadowColor = .white
         shadowOffset = CGSize()
-        shadowRadius = 2.0
-        shadowOpacity = 0.5
-        textColor = .white
+        shadowRadius = 0
+        shadowOpacity = 0
+        textColor = .black
         textFont = UIFont.systemFont(ofSize: 17)
         textShadowOpened = false
         super.init()
@@ -64,30 +77,6 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
         if textShadowOpened {
             textAttribute.removeValue(forKey: NSAttributedStringKey.strokeColor)
             textAttribute.removeValue(forKey: NSAttributedStringKey.strokeWidth)
-        }
-    }
-    
-    public func set(textFont: UIFont) {
-        self.textFont = textFont
-        textAttribute[NSAttributedStringKey.font] = textFont
-    }
-    
-    public func set(textColor: UIColor) {
-        self.textColor = textColor
-        textAttribute[NSAttributedStringKey.foregroundColor] = textColor
-    }
-    
-    public func set(strokeColor: UIColor) {
-        self.strokeColor = strokeColor
-        if !textShadowOpened {
-            textAttribute[NSAttributedStringKey.strokeColor] = strokeColor
-        }
-    }
-    
-    public func set(strokeWidth: Int) {
-        self.strokeWidth = strokeWidth
-        if !textShadowOpened {
-            textAttribute[NSAttributedStringKey.strokeWidth] = NSNumber(integerLiteral: strokeWidth)
         }
     }
 }

@@ -30,8 +30,8 @@ public class SwiftBarrageRenderView: UIView {
     
     var autoClear: Bool?
     var renderStatus: SwiftBarrageRenderStatus
-    var trackNextAvailableTime: [String:String]
-    var renderPositionStyle:SwiftBarrageRenderPositionStyle?
+    var trackNextAvailableTime: [String:SwiftBarrageTrackInfo]
+    var renderPositionStyle:SwiftBarrageRenderPositionStyle
     
     init() {
         animatingCellsLock = DispatchSemaphore(value: 1)
@@ -41,8 +41,9 @@ public class SwiftBarrageRenderView: UIView {
         middlePositionView = UIView()
         highPositionView = UIView()
         veryHighPositionView = UIView()
-        trackNextAvailableTime = [String:String]()
+        trackNextAvailableTime = [String:SwiftBarrageTrackInfo]()
         renderStatus = .stopped
+        renderPositionStyle = .randomTracks
         super.init(frame: CGRect())
         addSubview(lowPositionView)
         addSubview(middlePositionView)
@@ -58,8 +59,9 @@ public class SwiftBarrageRenderView: UIView {
         middlePositionView = UIView()
         highPositionView = UIView()
         veryHighPositionView = UIView()
-        trackNextAvailableTime = [String:String]()
+        trackNextAvailableTime = [String:SwiftBarrageTrackInfo]()
         renderStatus = .stopped
+        renderPositionStyle = .randomTracks
         super.init(coder: aDecoder)
         addSubview(lowPositionView)
         addSubview(middlePositionView)
@@ -186,7 +188,7 @@ public class SwiftBarrageRenderView: UIView {
         barrageCell.idle = false
         animatingCellsLock.signal()
         add(barrageCell: barrageCell, with: barrageCell.barrageDescriptor?.positionPriority)
-        let cellFrame = calculationFrame(of: barrageCell)
+        let cellFrame = calculationFrame(barrageCell: barrageCell)
         barrageCell.frame = cellFrame
         barrageCell.addBarrageAnimation(with: self)
         recordTrackInfo(with: barrageCell)
@@ -206,28 +208,258 @@ public class SwiftBarrageRenderView: UIView {
         }
     }
     
-    func calculationFrame(of barrageCell: SwiftBarrageCell) -> CGRect {
+    func calculationFrame(barrageCell: SwiftBarrageCell) -> CGRect {
         var cellFrame = barrageCell.bounds
         cellFrame.origin.x = self.frame.maxX
-        if barrageCell.barrageDescriptor?.renderRange?.lowerBound == 0 &&  barrageCell.barrageDescriptor?.renderRange?.upperBound == 0 {
+        if barrageCell.barrageDescriptor?.renderRange == Range<CGFloat>.init(uncheckedBounds: (0,0)) {
             let cellHeight = barrageCell.bounds.height
-            let minOriginY = barrageCell.barrageDescriptor?.renderRange?.lowerBound
-            let maxOriginY = barrageCell.barrageDescriptor?.renderRange?.upperBound
-            if minOriginY
-            
+            if var minOriginY = barrageCell.barrageDescriptor?.renderRange?.lowerBound,
+                var maxOriginY = barrageCell.barrageDescriptor?.renderRange?.upperBound {
+                if maxOriginY > self.bounds.height {
+                    maxOriginY = self.bounds.height
+                }
+                if minOriginY < 0 {
+                    minOriginY = 0
+                }
+                var renderHeight = maxOriginY-minOriginY
+                if renderHeight < 0 {
+                    renderHeight = cellHeight
+                }
+                let trackCount = Int(floorf(Float(renderHeight/cellHeight)))
+                var trackIndex = Int(arc4random_uniform(UInt32(trackCount)))
+                _ = trackInfoLock.wait(timeout: DispatchTime.distantFuture)
+                let trackInfo = trackNextAvailableTime[kNextAvailableTimeKey(identifier: NSStringFromClass(barrageCell.classForCoder), index: trackIndex)]
+                if let time = trackInfo?.nextAvailableTime {
+                    if time > CACurrentMediaTime() {
+                        var availableTrackInfos = [SwiftBarrageTrackInfo]()
+                        for info in trackNextAvailableTime.values {
+                            if CACurrentMediaTime() > info.nextAvailableTime && info.trackIdentifier.contains(NSStringFromClass(barrageCell.classForCoder)) {
+                                availableTrackInfos.append(info)
+                            }
+                        }
+                        if let randomInfo = availableTrackInfos.randomObject() {
+                            trackIndex = randomInfo.trackIndex
+                        } else {
+                            if trackNextAvailableTime.count < trackCount {
+                                var numberArray = [Int]()
+                                for index in 0 ..< trackCount {
+                                    if let _ = trackNextAvailableTime[kNextAvailableTimeKey(identifier: NSStringFromClass(barrageCell.classForCoder), index: index)] {
+                                        numberArray.append(index)
+                                    }
+                                }
+                                if let value = numberArray.randomObject() {
+                                    trackIndex = value
+                                }
+                            }
+                        }
+                    }
+                }
+                _ = trackInfoLock.signal()
+                barrageCell.trackIndex = trackIndex
+                cellFrame.origin.y = CGFloat(trackIndex)*cellHeight+minOriginY
+            }
+        } else {
+            switch renderPositionStyle {
+            case .random :
+                let maxY = self.bounds.height - cellFrame.height
+                let originY = Int(floorf(Float(maxY)))
+                cellFrame.origin.y = CGFloat(arc4random_uniform(UInt32(originY)))
+            case .increase:
+                if let cell = lastestCell {
+                    let lastestFrame = cell.frame
+                    cellFrame.origin.y = lastestFrame.maxY
+                } else {
+                    cellFrame.origin.y = 0
+                }
+            case .randomTracks:
+                let renderViewHeight = self.bounds.height
+                let cellHeight = barrageCell.bounds.height
+                let floatCount = floorf(Float(renderViewHeight/cellHeight))
+                
+                
+                guard !(floatCount.isNaN || floatCount.isInfinite) else {
+                    
+                    return CGRect()
+                }
+                
+                let trackCount = Int(floatCount)
+                var trackIndex = Int(arc4random_uniform(UInt32(trackCount)))
+                _ = trackInfoLock.wait(timeout: DispatchTime.distantFuture)
+                let trackInfo = trackNextAvailableTime[kNextAvailableTimeKey(identifier: NSStringFromClass(barrageCell.classForCoder), index: trackIndex)]
+                if let time = trackInfo?.nextAvailableTime {
+                    if time > CACurrentMediaTime() {
+                        var availableTrackInfos = [SwiftBarrageTrackInfo]()
+                        for info in trackNextAvailableTime.values {
+                            if CACurrentMediaTime() > info.nextAvailableTime && info.trackIdentifier.contains(NSStringFromClass(barrageCell.classForCoder)) {
+                                availableTrackInfos.append(info)
+                            }
+                        }
+                        if let randomInfo = availableTrackInfos.randomObject() {
+                            trackIndex = randomInfo.trackIndex
+                        } else {
+                            if trackNextAvailableTime.count < trackCount {
+                                var numberArray = [Int]()
+                                for index in 0 ..< trackCount {
+                                    if let _ = trackNextAvailableTime[kNextAvailableTimeKey(identifier: NSStringFromClass(barrageCell.classForCoder), index: index)] {
+                                        numberArray.append(index)
+                                    }
+                                }
+                                if let value = numberArray.randomObject() {
+                                    trackIndex = value
+                                }
+                            }
+                        }
+                    }
+                }
+                _ = trackInfoLock.signal()
+                barrageCell.trackIndex = trackIndex
+                cellFrame.origin.y = CGFloat(trackIndex)*cellHeight
+            }
         }
-        return CGRect()
-    }
-    
-    func recordTrackInfo(with barrageCell: SwiftBarrageCell) {
-        
+        if cellFrame.maxY > self.bounds.height {
+            cellFrame.origin.y = 0
+        } else if cellFrame.origin.y < 0{
+            cellFrame.origin.y = 0
+        }
+        return cellFrame
     }
     
     @objc public func clearIdleCells() {
+        _ = idleCellsLock.wait(timeout: DispatchTime.distantFuture)
+        let timeInterval = Date().timeIntervalSince1970
+        for (index,cell) in idleCells.reversed().enumerated() {
+            let time = timeInterval - cell.idleTime
+            if time > 5 && cell.idleTime > 0 {
+                idleCells.remove(at: index)
+            }
+        }
+        if (self.idleCells.isEmpty) {
+            autoClear = false
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+5.0) {
+                self.clearIdleCells()
+            }
+        }
+        _ = idleCellsLock.signal()
+    }
+    
+    func recordTrackInfo(with barrageCell: SwiftBarrageCell) {
+        let key = kNextAvailableTimeKey(identifier: NSStringFromClass(barrageCell.classForCoder), index: barrageCell.trackIndex)
+        guard let animation = barrageCell.barrageAnimation else {return}
         
+        let duration = animation.duration
+        var fromValue: NSValue?
+        var toValue: NSValue?
+        if let basicAnimation = animation as? CABasicAnimation {
+            fromValue = basicAnimation.fromValue as? NSValue
+            toValue = basicAnimation.toValue as? NSValue
+        }
+        if let keyframeAnimation = animation as? CAKeyframeAnimation {
+            fromValue = keyframeAnimation.values?.first as? NSValue
+            toValue = keyframeAnimation.values?.last as? NSValue
+        }
+        if let fromValueType = fromValue?.objCType ,
+            let toValueType = toValue?.objCType{
+            if let fromValueTypeString = String(validatingUTF8: fromValueType),
+                let toValueTypeString = String(validatingUTF8: toValueType) {
+                if fromValueTypeString != toValueTypeString {
+                    return
+                }
+                if fromValueTypeString.contains("CGPoint") {
+                    if let fromPoint = fromValue?.cgPointValue,
+                        let toPoint = toValue?.cgPointValue{
+                        _ = trackInfoLock.wait(timeout: DispatchTime.distantFuture)
+                        var trackInfo = trackNextAvailableTime[key]
+                        if trackInfo == nil {
+                            trackInfo = SwiftBarrageTrackInfo.init(trackIndex: barrageCell.trackIndex, trackIdentifier: key)
+                        }
+                        trackInfo!.barrageCount += 1
+                        trackInfo!.nextAvailableTime = CFTimeInterval(barrageCell.bounds.width)
+                        let distanceX = fabs(toPoint.x-fromPoint.x)
+                        let distanceY = fabs(toPoint.y-fromPoint.y)
+                        let distance = max(distanceX, distanceY)
+                        let speed = Double(distance)/duration
+                        if(distanceX == distance) {
+                            let time = Double(barrageCell.bounds.width)/speed
+                            trackInfo!.nextAvailableTime = CACurrentMediaTime() + time + 0.1
+                            trackNextAvailableTime[key] = trackInfo!
+                        }
+                        _ = trackInfoLock.signal()
+                        return
+                    }
+                } else if fromValueTypeString.contains("CGVector") {
+                    return
+                }
+            }
+        }
+    }
+    
+    
+}
+
+func kNextAvailableTimeKey(identifier:String,index:Int) -> String{
+    return "\(identifier)_\(index)"
+}
+extension SwiftBarrageRenderView: CAAnimationDelegate {
+    public func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        if !flag {return}
+        if self.renderStatus == .stopped {return}
+        _ = animatingCellsLock.wait(timeout: .distantFuture)
+        var animationedCell: SwiftBarrageCell?
+        for cell in animationCells {
+            if let animation = cell.barrageAnimation {
+                if animation == anim {
+                    animationedCell = cell
+                    if let index = animationCells.index(of: cell) {
+                        animationCells.remove(at: index)
+                        break
+                    }
+                }
+            }
+        }
+        _ = animatingCellsLock.signal()
+        if animationedCell == nil {
+            return
+        }
+        _ = trackInfoLock.wait(timeout: .distantFuture)
+        if let trackInfo = trackNextAvailableTime[kNextAvailableTimeKey(identifier: NSStringFromClass(animationedCell!.classForCoder), index: animationedCell!.trackIndex)] {
+            trackInfo.barrageCount -= 1
+        }
+        _ = trackInfoLock.signal()
+        animationedCell!.removeFromSuperview()
+        animationedCell!.prepareForReuse()
+        _ = idleCellsLock.wait(timeout: .distantFuture)
+        animationedCell!.idleTime = Date().timeIntervalSince1970;
+        idleCells.append(animationedCell!)
+        _ = idleCellsLock.signal()
+        if (autoClear == false || autoClear == nil) {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+5) {
+                self.clearIdleCells()
+            }
+            autoClear = true
+        }
     }
 }
 
-extension SwiftBarrageRenderView: CAAnimationDelegate {
-    
+extension SwiftBarrageRenderView {
+    public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if event?.type == UIEventType.touches {
+            if let touch = touches.first {
+                let point = touch.location(in: self)
+                _ = animatingCellsLock.wait(timeout: .distantFuture)
+                for cell in animationCells {
+                    if let presentationLayer = cell.layer.presentation() {
+                        if presentationLayer.hitTest(point) != nil {
+                            if cell.barrageDescriptor?.touchAction != nil,
+                                let barrageDescriptor = cell.barrageDescriptor{
+                                barrageDescriptor.touchAction?(barrageDescriptor)
+                            }
+                            break
+                        }
+                    }
+                }
+                _ = animatingCellsLock.signal()
+            }
+        }
+    }
 }

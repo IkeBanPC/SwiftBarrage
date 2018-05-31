@@ -19,4 +19,4 @@ public enum SwiftBarrageRenderPositionStyle: Int {
     case random
     case increase
 }
-public typealias SwiftBarrageTouchAction = () -> ()
+public typealias SwiftBarrageTouchAction = (SwiftBarrageDescriptor) -> ()

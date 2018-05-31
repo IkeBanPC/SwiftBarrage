@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6A6499AE20BFA03E00F4A44F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6499AD20BFA03E00F4A44F /* Extensions.swift */; };
 		C39768152058D55C0054817D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39768142058D55C0054817D /* AppDelegate.swift */; };
 		C39768172058D55C0054817D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C39768162058D55C0054817D /* ViewController.swift */; };
 		C397681A2058D55C0054817D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C39768182058D55C0054817D /* Main.storyboard */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6A6499AD20BFA03E00F4A44F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C39768112058D55C0054817D /* SwiftBarrage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftBarrage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C39768142058D55C0054817D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C39768162058D55C0054817D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 				C39768332058E68A0054817D /* SwiftBarrageTrackInfo.swift */,
 				C39768352058E71E0054817D /* SwiftBarrageTextDescriptor.swift */,
 				C39768382058EEA70054817D /* SwiftBarrageTextCell.swift */,
+				6A6499AD20BFA03E00F4A44F /* Extensions.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -126,7 +129,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = IsaacPan;
 				TargetAttributes = {
 					C39768102058D55C0054817D = {
@@ -178,6 +181,7 @@
 				C39768322058E2230054817D /* SwiftBarrageRenderView.swift in Sources */,
 				C39768392058EEA70054817D /* SwiftBarrageTextCell.swift in Sources */,
 				C397682A2058D7DD0054817D /* SwiftBarrageCell.swift in Sources */,
+				6A6499AE20BFA03E00F4A44F /* Extensions.swift in Sources */,
 				C39768302058E1E10054817D /* SwiftBarrageManager.swift in Sources */,
 				C39768342058E68A0054817D /* SwiftBarrageTrackInfo.swift in Sources */,
 				C397682C2058D8870054817D /* SwiftBarrageDescriptor.swift in Sources */,
@@ -221,6 +225,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -228,6 +233,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -278,6 +284,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -285,6 +292,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -319,7 +327,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = W48WUZ29VT;
+				DEVELOPMENT_TEAM = 67JGUTHB2Z;
 				INFOPLIST_FILE = SwiftBarrage/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ikeban.SwiftBarrage;
@@ -334,7 +342,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = W48WUZ29VT;
+				DEVELOPMENT_TEAM = 67JGUTHB2Z;
 				INFOPLIST_FILE = SwiftBarrage/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ikeban.SwiftBarrage;

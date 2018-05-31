@@ -9,23 +9,16 @@
 import UIKit
 
 public class SwiftBarrageTextCell: SwiftBarrageCell {
-    var textLabel: UILabel? {
-        get {
-            if self.textLabel == nil {
-                self.textLabel = UILabel()
-                self.textLabel?.textAlignment = .center
-            }
-            return self.textLabel
-        }
-        set {
-            self.textLabel = newValue
-        }
-    }
+    var textLabel: UILabel
     var textDescriptor: SwiftBarrageTextDescriptor?
     required public init() {
+        textLabel = UILabel()
+        textLabel.textAlignment = .center
         super.init()
     }
     required public init?(coder aDecoder: NSCoder) {
+        textLabel = UILabel()
+        textLabel.textAlignment = .center
         super.init(coder: aDecoder)
     }
     
@@ -34,37 +27,36 @@ public class SwiftBarrageTextCell: SwiftBarrageCell {
     }
     
     override func updateSubviewsData() {
-        if let label = textLabel {
-            addSubview(label)
-        }
+        addSubview(textLabel)
         if textDescriptor?.textShadowOpened == true {
             if let textDescriptor = self.textDescriptor {
-                textLabel?.layer.shadowColor = textDescriptor.shadowColor.cgColor
-                textLabel?.layer.shadowOpacity = textDescriptor.shadowOpacity
-                textLabel?.layer.shadowOffset = textDescriptor.shadowOffset
-                textLabel?.layer.shadowRadius = textDescriptor.shadowRadius
+                textLabel.layer.shadowColor = textDescriptor.shadowColor.cgColor
+                textLabel.layer.shadowOpacity = textDescriptor.shadowOpacity
+                textLabel.layer.shadowOffset = textDescriptor.shadowOffset
+                textLabel.layer.shadowRadius = textDescriptor.shadowRadius
             }
         }
-        textLabel?.attributedText = textDescriptor?.attributedText
+        textLabel.attributedText = textDescriptor?.attributedText
     }
     
     override func layoutContentSubviews() {
         if let textDescriptor = self.textDescriptor {
-            if let text = textDescriptor.attributedText?.string as NSString? {
-                let frame = text.boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude), options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: textDescriptor.attributedText?.attributes(at: 0, effectiveRange: nil), context: nil)
-                self.textLabel?.frame = frame
+            if let text = textDescriptor.attributedText?.string,
+                let attributes = textDescriptor.attributedText?.attributes(at: 0, effectiveRange: nil) {
+                let frame = text.boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude), options: [.usesLineFragmentOrigin, .usesFontLeading], attributes:attributes, context: nil)
+                self.textLabel.frame = frame
             }
         }
     }
     
     override func convertContentToImage() {
-        let contentImage = self.layer.convertContentToImageWithSize(contentSize: textLabel?.frame.size)
+        let contentImage = self.layer.convertContentToImageWithSize(contentSize: textLabel.frame.size)
         self.layer.contents = contentImage?.cgImage
     }
     
     override func removeSubViewsAndSublayers() {
         super.removeSubViewsAndSublayers()
-        textLabel = nil
+        textLabel.removeFromSuperview()
     }
     override func addBarrageAnimation(with animationDelegate: CAAnimationDelegate) {
         guard let superview = self.superview else {return}
