@@ -35,8 +35,8 @@ public class SwiftBarrageRenderView: UIView {
     
     init() {
         animatingCellsLock = DispatchSemaphore(value: 1)
-        idleCellsLock = DispatchSemaphore(value: 1)
-        trackInfoLock = DispatchSemaphore(value: 1)
+        idleCellsLock = DispatchSemaphore(value: 2)
+        trackInfoLock = DispatchSemaphore(value: 3)
         lowPositionView = UIView()
         middlePositionView = UIView()
         highPositionView = UIView()
@@ -327,10 +327,11 @@ public class SwiftBarrageRenderView: UIView {
     @objc public func clearIdleCells() {
         _ = idleCellsLock.wait(timeout: DispatchTime.distantFuture)
         let timeInterval = Date().timeIntervalSince1970
-        for (index,cell) in idleCells.reversed().enumerated() {
+        for (index,cell) in idleCells.enumerated() {
             let time = timeInterval - cell.idleTime
             if time > 5 && cell.idleTime > 0 {
                 idleCells.remove(at: index)
+                break
             }
         }
         if (self.idleCells.isEmpty) {

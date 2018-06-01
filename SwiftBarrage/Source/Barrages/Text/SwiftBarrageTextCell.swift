@@ -1,5 +1,5 @@
 //
-//  SwiftBarrageTextDescriptor.swift
+//  SwiftBarrageTextCell.swift
 //  SwiftBarrage
 //
 //  Created by Isaac Pan on 2018/3/14.
@@ -7,6 +7,82 @@
 //
 
 import UIKit
+
+public class SwiftBarrageTextCell: SwiftBarrageCell {
+    var textLabel: UILabel
+    var textDescriptor: SwiftBarrageTextDescriptor?
+    required public init() {
+        textLabel = UILabel()
+        super.init()
+    }
+    required public init?(coder aDecoder: NSCoder) {
+        textLabel = UILabel()
+        super.init(coder: aDecoder)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+    }
+    
+    override func updateSubviewsData() {
+        addSubview(textLabel)
+        if textDescriptor?.textShadowOpened == true {
+            if let textDescriptor = self.textDescriptor {
+                textLabel.layer.shadowColor = textDescriptor.shadowColor.cgColor
+                textLabel.layer.shadowOpacity = textDescriptor.shadowOpacity
+                textLabel.layer.shadowOffset = textDescriptor.shadowOffset
+                textLabel.layer.shadowRadius = textDescriptor.shadowRadius
+            }
+        }
+        textLabel.attributedText = textDescriptor?.attributedText
+    }
+    
+    override func layoutContentSubviews() {
+        if let textDescriptor = self.textDescriptor {
+            if let text = textDescriptor.attributedText?.string,
+                let attributes = textDescriptor.attributedText?.attributes(at: 0, effectiveRange: nil) {
+                let frame = text.boundingRect(with: CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude), options: [.usesLineFragmentOrigin, .usesFontLeading], attributes:attributes, context: nil)
+                textLabel.frame = CGRect(x: frame.minX, y: frame.minY, width: frame.size.width+2*textDescriptor.horizontalSpace, height: frame.size.height+2*textDescriptor.verticalSpace)
+                textLabel.textAlignment = .center
+                textLabel.backgroundColor = textDescriptor.backgroundColor
+            }
+        }
+    }
+    
+    override func convertContentToImage() {
+        let contentImage = self.layer.convertContentToImageWithSize(contentSize: textLabel.frame.size)
+        self.layer.contents = contentImage?.cgImage
+    }
+    
+    override func removeSubViewsAndSublayers() {
+        super.removeSubViewsAndSublayers()
+        textLabel.removeFromSuperview()
+    }
+    override func addBarrageAnimation(with animationDelegate: CAAnimationDelegate) {
+        guard let superview = self.superview else {return}
+        let startCenter = CGPoint(x: superview.bounds.maxX+self.bounds.width/2, y: self.center.y)
+        let endCenter = CGPoint(x: -self.bounds.width/2, y: self.center.y)
+        let walkAnimation = CAKeyframeAnimation(keyPath: "position")
+        walkAnimation.values = [NSValue(cgPoint: startCenter),NSValue(cgPoint: endCenter)]
+        walkAnimation.keyTimes = [0.0,1.0]
+        if let duration = self.textDescriptor?.animationDuration {
+            walkAnimation.duration = duration
+        }
+        walkAnimation.repeatCount = 1
+        walkAnimation.delegate = animationDelegate
+        walkAnimation.isRemovedOnCompletion = false
+        walkAnimation.fillMode = kCAFillModeForwards
+        self.layer.add(walkAnimation, forKey: kBarrageAnimation)
+    }
+    
+    override func set(barrageDescriptor: SwiftBarrageDescriptor) {
+        super.set(barrageDescriptor: barrageDescriptor)
+        if case let barrageDescriptor as SwiftBarrageTextDescriptor = barrageDescriptor {
+            self.textDescriptor = barrageDescriptor
+        }
+    }
+}
+
 public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
     var textAttribute: [NSAttributedStringKey:Any]
     var textFont: UIFont {
@@ -19,6 +95,7 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
             textAttribute[NSAttributedStringKey.foregroundColor] = textColor
         }
     }
+    var backgroundColor: UIColor = UIColor.clear
     var textShadowOpened: Bool
     var shadowColor: UIColor {
         didSet {
@@ -44,6 +121,9 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
             }
         }
     }
+    var horizontalSpace:CGFloat = 0
+    var verticalSpace:CGFloat = 0
+    
     var text: String?
     
     var attributedText: NSAttributedString? {
@@ -57,9 +137,15 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
                 ], range: NSRange(location: 0, length: attributedText.string.count))
             return  attributedText.copy() as? NSAttributedString
         }
+        set {
+            if let noNilValue = newValue {
+                self.text = noNilValue.string
+                self.textAttribute = noNilValue.attributes(at: 0, effectiveRange: nil)
+            }
+        }
     }
-
-
+    
+    
     override init() {
         textAttribute = [NSAttributedStringKey:Any]()
         shadowColor = .white

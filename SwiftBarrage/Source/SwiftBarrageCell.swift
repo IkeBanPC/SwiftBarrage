@@ -63,6 +63,18 @@ public class SwiftBarrageCell: UIView {
                     width = maxX
                 }
             }
+            if sublayers.count == 0 {
+                for view in subviews {
+                    let maxY = view.frame.maxY
+                    if maxY > height {
+                        height = maxY
+                    }
+                    let maxX = view.frame.maxX
+                    if maxX > width {
+                        width = maxX
+                    }
+                }
+            }
         }
         if width == 0 || height == 0 {
             if let content = self.layer.contents as! CGImage? {
@@ -71,16 +83,20 @@ public class SwiftBarrageCell: UIView {
                 height = image.size.height/UIScreen.main.scale
             }
         }
-        self.bounds = CGRect(x: 0, y: 0, width: width, height: height)
+        if width != 0 && height != 0 {
+            self.bounds = CGRect(x: 0, y: 0, width: width, height: height)
+        }
     }
     
     func removeSubViewsAndSublayers() {
-        for view in self.subviews.reversed() {
-            view.removeFromSuperview()
-        }
-        if let sublayers = self.layer.sublayers?.reversed() {
-            for sublayer in sublayers {
-                sublayer.removeFromSuperlayer()
+        if self.barrageDescriptor?.shouldRemoveSubViewsAndSublayers == true {
+            for view in self.subviews.reversed() {
+                view.removeFromSuperview()
+            }
+            if let sublayers = self.layer.sublayers?.reversed() {
+                for sublayer in sublayers {
+                    sublayer.removeFromSuperlayer()
+                }
             }
         }
     }

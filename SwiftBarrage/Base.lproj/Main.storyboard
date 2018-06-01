@@ -26,7 +26,9 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="80" id="J1O-Fm-vgr"/>
                                         </constraints>
-                                        <state key="normal" title="Start"/>
+                                        <state key="normal" title="Start">
+                                            <color key="titleColor" red="1" green="0.2527923882" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="startButtonCliked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="JyZ-Km-haI"/>
                                         </connections>
@@ -36,7 +38,9 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="80" id="GYd-Yj-QQq"/>
                                         </constraints>
-                                        <state key="normal" title="Pause"/>
+                                        <state key="normal" title="Pause">
+                                            <color key="titleColor" red="1" green="0.2527923882" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="pauseButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="mgu-NQ-4iv"/>
                                         </connections>
@@ -46,7 +50,9 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="80" id="INz-8U-InU"/>
                                         </constraints>
-                                        <state key="normal" title="Resume"/>
+                                        <state key="normal" title="Resume">
+                                            <color key="titleColor" red="1" green="0.2527923882" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="resumeButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ZUd-V6-anW"/>
                                         </connections>
@@ -56,13 +62,15 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="80" id="SRE-7m-imJ"/>
                                         </constraints>
-                                        <state key="normal" title="Stop"/>
+                                        <state key="normal" title="Stop">
+                                            <color key="titleColor" red="1" green="0.2527923882" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="stopButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="OUG-Vl-hSc"/>
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="l3Y-BT-b5V" firstAttribute="centerY" secondItem="aRR-xD-kgO" secondAttribute="centerY" id="0cc-W1-xkC"/>
                                     <constraint firstItem="oxf-PJ-SfM" firstAttribute="centerY" secondItem="aRR-xD-kgO" secondAttribute="centerY" id="8Ca-9l-C1J"/>

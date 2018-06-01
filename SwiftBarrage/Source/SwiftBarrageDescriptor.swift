@@ -9,9 +9,10 @@
 import UIKit
 
 public class SwiftBarrageDescriptor {
+    var shouldRemoveSubViewsAndSublayers: Bool = true
     var barrageCellClass: AnyClass?
     var positionPriority: SwiftBarragePositionPriority?
-    var animationDuration: CFTimeInterval?
+    var animationDuration: CFTimeInterval = 1
     var touchAction: SwiftBarrageTouchAction?
     var borderColor: UIColor?
     var borderWidth: CGFloat?
