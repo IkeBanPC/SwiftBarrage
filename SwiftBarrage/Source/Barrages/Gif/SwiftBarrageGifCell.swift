@@ -52,7 +52,7 @@ public class SwiftBarrageGifCell: SwiftBarrageCell {
             walkAnimation.repeatCount = 1
             walkAnimation.delegate = animationDelegate
             walkAnimation.isRemovedOnCompletion = false
-            walkAnimation.fillMode = kCAFillModeForwards
+            walkAnimation.fillMode = .forwards
             layer.add(walkAnimation, forKey: kBarrageAnimation)
         }
     }

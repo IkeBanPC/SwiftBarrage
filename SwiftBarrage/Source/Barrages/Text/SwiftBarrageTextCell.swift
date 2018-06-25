@@ -34,7 +34,9 @@ public class SwiftBarrageTextCell: SwiftBarrageCell {
                 textLabel.layer.shadowRadius = textDescriptor.shadowRadius
             }
         }
-        textLabel.attributedText = textDescriptor?.attributedText
+        let attributedText = textDescriptor?.attributedText
+        
+        textLabel.attributedText = attributedText
     }
     
     override func layoutContentSubviews() {
@@ -71,7 +73,7 @@ public class SwiftBarrageTextCell: SwiftBarrageCell {
         walkAnimation.repeatCount = 1
         walkAnimation.delegate = animationDelegate
         walkAnimation.isRemovedOnCompletion = false
-        walkAnimation.fillMode = kCAFillModeForwards
+        walkAnimation.fillMode = .forwards
         self.layer.add(walkAnimation, forKey: kBarrageAnimation)
     }
     
@@ -84,15 +86,15 @@ public class SwiftBarrageTextCell: SwiftBarrageCell {
 }
 
 public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
-    var textAttribute: [NSAttributedStringKey:Any]
+    var textAttribute: [NSAttributedString.Key:Any]
     var textFont: UIFont {
         didSet {
-            textAttribute[NSAttributedStringKey.font] = textFont
+            textAttribute[.font] = textFont
         }
     }
     var textColor: UIColor {
         didSet {
-            textAttribute[NSAttributedStringKey.foregroundColor] = textColor
+            textAttribute[.foregroundColor] = textColor
         }
     }
     var backgroundColor: UIColor = UIColor.clear
@@ -100,7 +102,7 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
     var shadowColor: UIColor {
         didSet {
             if !textShadowOpened {
-                textAttribute[NSAttributedStringKey.strokeColor] = strokeColor
+                textAttribute[.strokeColor] = strokeColor
             }
         }
     }
@@ -110,14 +112,14 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
     var strokeColor: UIColor? {
         didSet {
             if let color = strokeColor {
-                textAttribute[NSAttributedStringKey.strokeColor] = color
+                textAttribute[.strokeColor] = color
             }
         }
     }
     var strokeWidth: Float? {
         didSet {
             if let width = strokeWidth {
-                textAttribute[NSAttributedStringKey.strokeWidth] = NSNumber(value: width)
+                textAttribute[.strokeWidth] = NSNumber(value: width)
             }
         }
     }
@@ -133,21 +135,23 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
             paragraphStyle.baseWritingDirection = .leftToRight
             let attributedText = NSMutableAttributedString(attributedString: tempAttributedText)
             attributedText.addAttributes([
-                NSAttributedStringKey.paragraphStyle:paragraphStyle,
+                .paragraphStyle:paragraphStyle,
                 ], range: NSRange(location: 0, length: attributedText.string.count))
             return  attributedText.copy() as? NSAttributedString
         }
         set {
             if let noNilValue = newValue {
                 self.text = noNilValue.string
-                self.textAttribute = noNilValue.attributes(at: 0, effectiveRange: nil)
+                for (key,value) in noNilValue.attributes(at: 0, effectiveRange: nil) {
+                    self.textAttribute[key] = value
+                }
             }
         }
     }
     
     
     override init() {
-        textAttribute = [NSAttributedStringKey:Any]()
+        textAttribute = [NSAttributedString.Key:Any]()
         shadowColor = .white
         shadowOffset = CGSize()
         shadowRadius = 0
@@ -161,8 +165,8 @@ public class SwiftBarrageTextDescriptor: SwiftBarrageDescriptor {
     public func set(textShadowOpened: Bool) {
         self.textShadowOpened = textShadowOpened
         if textShadowOpened {
-            textAttribute.removeValue(forKey: NSAttributedStringKey.strokeColor)
-            textAttribute.removeValue(forKey: NSAttributedStringKey.strokeWidth)
+            textAttribute.removeValue(forKey: .strokeColor)
+            textAttribute.removeValue(forKey: .strokeWidth)
         }
     }
 }

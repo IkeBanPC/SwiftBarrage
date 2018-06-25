@@ -189,6 +189,7 @@ public class SwiftBarrageRenderView: UIView {
         animatingCellsLock.signal()
         add(barrageCell: barrageCell, with: barrageCell.barrageDescriptor?.positionPriority)
         let cellFrame = calculationFrame(barrageCell: barrageCell)
+        
         barrageCell.frame = cellFrame
         barrageCell.addBarrageAnimation(with: self)
         recordTrackInfo(with: barrageCell)
@@ -275,13 +276,9 @@ public class SwiftBarrageRenderView: UIView {
                 let renderViewHeight = self.bounds.height
                 let cellHeight = barrageCell.bounds.height
                 let floatCount = floorf(Float(renderViewHeight/cellHeight))
-                
-                
                 guard !(floatCount.isNaN || floatCount.isInfinite) else {
-                    
                     return CGRect()
                 }
-                
                 let trackCount = Int(floatCount)
                 var trackIndex = Int(arc4random_uniform(UInt32(trackCount)))
                 _ = trackInfoLock.wait(timeout: DispatchTime.distantFuture)
@@ -327,12 +324,12 @@ public class SwiftBarrageRenderView: UIView {
     @objc public func clearIdleCells() {
         _ = idleCellsLock.wait(timeout: DispatchTime.distantFuture)
         let timeInterval = Date().timeIntervalSince1970
-        for (index,cell) in idleCells.enumerated() {
+        idleCells.removeAll { (cell) -> Bool in
             let time = timeInterval - cell.idleTime
             if time > 5 && cell.idleTime > 0 {
-                idleCells.remove(at: index)
-                break
+                return true
             }
+            return false
         }
         if (self.idleCells.isEmpty) {
             autoClear = false
@@ -444,7 +441,7 @@ extension SwiftBarrageRenderView: CAAnimationDelegate {
 
 extension SwiftBarrageRenderView {
     public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if event?.type == UIEventType.touches {
+        if event?.type == UIEvent.EventType.touches {
             if let touch = touches.first {
                 let point = touch.location(in: self)
                 _ = animatingCellsLock.wait(timeout: .distantFuture)

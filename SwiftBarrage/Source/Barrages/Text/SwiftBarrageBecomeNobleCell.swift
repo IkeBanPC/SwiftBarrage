@@ -33,8 +33,7 @@ public class SwiftBarrageBecomeNobleCell: SwiftBarrageTextCell{
     }
     override func layoutContentSubviews() {
         super.layoutContentSubviews()
-        if let descriptor = nobleDescriptor,
-            let image = nobleDescriptor?.backgroundImage {
+        if let image = nobleDescriptor?.backgroundImage {
             backgroundImageLayer.frame = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
         }
         var center = backgroundImageLayer.position
@@ -44,7 +43,7 @@ public class SwiftBarrageBecomeNobleCell: SwiftBarrageTextCell{
     override func convertContentToImage() {
         if let image = nobleDescriptor?.backgroundImage {
             let layerImage = self.layer.convertContentToImageWithSize(contentSize: CGSize(width: image.size.width, height: image.size.height))
-            layer.contents = layerImage
+            layer.contents = layerImage?.cgImage
         }
     }
     override func addBarrageAnimation(with animationDelegate: CAAnimationDelegate) {
@@ -53,7 +52,7 @@ public class SwiftBarrageBecomeNobleCell: SwiftBarrageTextCell{
             let stopCenter = CGPoint(x: superview.bounds.midX, y: center.y)
             let endCenter = CGPoint(x: -bounds.width/2, y: center.y)
             let walkAnimation = CAKeyframeAnimation(keyPath: "position")
-            walkAnimation.values = [NSValue(cgPoint: startCenter),NSValue(cgPoint: stopCenter),NSValue(cgPoint: endCenter)]
+            walkAnimation.values = [NSValue(cgPoint: startCenter),NSValue(cgPoint: stopCenter),NSValue(cgPoint: stopCenter),NSValue(cgPoint: endCenter)]
             walkAnimation.keyTimes = [0.0,0.25,0.75,1.0]
             if let duration = self.textDescriptor?.animationDuration {
                 walkAnimation.duration = duration
@@ -61,7 +60,7 @@ public class SwiftBarrageBecomeNobleCell: SwiftBarrageTextCell{
             walkAnimation.repeatCount = 1
             walkAnimation.delegate = animationDelegate
             walkAnimation.isRemovedOnCompletion = false
-            walkAnimation.fillMode = kCAFillModeForwards
+            walkAnimation.fillMode = .forwards
             self.layer.add(walkAnimation, forKey: kBarrageAnimation)
         }
     }

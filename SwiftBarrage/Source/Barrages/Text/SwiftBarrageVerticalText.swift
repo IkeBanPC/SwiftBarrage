@@ -24,7 +24,7 @@ public class SwiftBarrageVerticalTextCell: SwiftBarrageTextCell {
             walkAnimation.repeatCount = 1
             walkAnimation.delegate = animationDelegate
             walkAnimation.isRemovedOnCompletion = false
-            walkAnimation.fillMode = kCAFillModeForwards
+            walkAnimation.fillMode = .forwards
             self.layer.add(walkAnimation, forKey: kBarrageAnimation)
         }
     }
